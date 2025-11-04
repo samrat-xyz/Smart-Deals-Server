@@ -2,9 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
-const admin = require("firebase-admin");
-
-const serviceAccount = require("./smart-deals-firebase-admin-sdk.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -30,10 +27,7 @@ const port = process.env.PORT || 3030;
 
 app.use(cors());
 app.use(express.json());
-const logger = (req, res, next) => {
-  console.log("Login Info");
-  next();
-};
+
 
 const verifyFireBaseToken = async(req, res, next) => {
   if(!req.headers.authorization){
@@ -72,6 +66,16 @@ async function run() {
     const productCollections = database.collection("Products");
     const userCollections = database.collection("Users");
     const bidCollections = database.collection("Bids");
+
+    // JWT realted apis
+
+    app.post('/getToken',async(req,res)=>{
+      const loggedUser = req.body;
+      console.log(loggedUser)
+      const token = jwt.sign(loggedUser,process.env.JWT_SECRET,{expiresIn:'1h'})
+      res.send({token})
+    })
+    
     //  USERS API
 
     // Create User (POST)
@@ -180,7 +184,7 @@ async function run() {
     });
 
     // Get Bids (All or by email)
-    app.get("/bids", logger, verifyFireBaseToken, async (req, res) => {
+    app.get("/bids", verifyFireBaseToken, async (req, res) => {
       // console.log('author',req.headers)
       const email = req.query.email;
       const query = {};
