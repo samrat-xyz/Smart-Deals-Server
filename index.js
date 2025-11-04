@@ -2,12 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
-
 // MongoDB Connection
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.me32qay.mongodb.net/?appName=Cluster0`;
